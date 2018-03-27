@@ -3,6 +3,8 @@ package com.invictus.prabodha.spectrummanager.Sense;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.invictus.prabodha.spectrummanager.R;
+
 public class SenseActivity extends AppCompatActivity {
 
     @Override

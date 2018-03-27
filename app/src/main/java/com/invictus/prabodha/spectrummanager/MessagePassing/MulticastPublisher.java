@@ -41,6 +41,7 @@ public class MulticastPublisher {
         socket.setNetworkInterface(eth0);
 
         socket.setBroadcast(true);
+        socket.setLoopbackMode(true);
         group = InetAddress.getByName("230.0.0.0");
         buf = multicastMessage.getBytes();
 

@@ -24,12 +24,16 @@ abstract class MulticastReceiver extends Thread {
 
             socket = new MulticastSocket(4446);
             InetAddress group = InetAddress.getByName("230.0.0.0");
+
             socket.joinGroup(group);
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
-            socket.receive(packet);
-            String received = new String(packet.getData(), 0, packet.getLength());
-            notifyReceiveComplete(packet);
-            socket.leaveGroup(group);
+            while (true){
+                DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                socket.receive(packet);
+                String received = new String(packet.getData(), 0, packet.getLength());
+                notifyReceiveComplete(packet);
+            }
+
+            //socket.leaveGroup(group);
 
         } catch (IOException e) {
             e.printStackTrace();

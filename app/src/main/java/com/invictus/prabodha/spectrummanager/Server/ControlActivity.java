@@ -101,7 +101,7 @@ public class ControlActivity extends AppCompatActivity {
 
     private String generateBroadcastMessage(){
         //message format -> ip_address,mac_address,channel_no ip_address,mac_address,channel_no, ...
-        String message="";
+        String message="ClientActivity@";
         for (Client c:clientsList){
             message+=c.getIpAddress()+",";
             message+=c.getMacAddress()+",";
@@ -127,7 +127,7 @@ public class ControlActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             setAdapter();
-            assignChannels.setEnabled(false);
+            //assignChannels.setEnabled(false);
 
         }
     }

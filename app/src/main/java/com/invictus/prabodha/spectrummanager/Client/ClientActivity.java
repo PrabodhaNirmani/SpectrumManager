@@ -18,13 +18,12 @@ import android.widget.TextView;
 
 
 import com.invictus.prabodha.spectrummanager.Advertise.AdvertiseActivity;
-import com.invictus.prabodha.spectrummanager.HomeActivity;
 import com.invictus.prabodha.spectrummanager.MessagePassing.ClientActivityMulticastReceiver;
 import com.invictus.prabodha.spectrummanager.MessagePassing.MulticastPublisher;
 import com.invictus.prabodha.spectrummanager.Models.Client;
 import com.invictus.prabodha.spectrummanager.R;
 import com.invictus.prabodha.spectrummanager.Sense.SenseActivity;
-import com.invictus.prabodha.spectrummanager.Server.ControlActivity;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,6 +32,8 @@ public class ClientActivity extends AppCompatActivity {
 
 
     private static Context context;
+
+    private static Client myDevice;
     private ProgressDialog progressDialog;
 
     private TextView tvIPAddress, tvMACAddress, tvChannelNo;
@@ -45,13 +46,14 @@ public class ClientActivity extends AppCompatActivity {
     public static final String ACTION_PACKET_RECEIVED = "client_activity_packet_received";
     public  static final String EXTRA_DATA = "extra_data";
 
+    private ClientActivityMulticastReceiver listenThread;
+
     private final BroadcastReceiver packetReceiveListener = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message=intent.getStringExtra(EXTRA_DATA);
-            if (progressDialog.isShowing()) {
-                dismissProgressDialog();
-            }
+
+            Log.d(TAG,message);
             updateUI(message);
 
         }
@@ -67,7 +69,8 @@ public class ClientActivity extends AppCompatActivity {
 
         initializeUI();
 
-        new ClientActivityMulticastReceiver().start();
+        listenThread = new ClientActivityMulticastReceiver();
+        listenThread.start();
 
         displayProgressDialog("Please wait","Waiting to receive packet " );
 
@@ -98,6 +101,8 @@ public class ClientActivity extends AppCompatActivity {
         if (progressDialog != null && progressDialog.isShowing())
             progressDialog.dismiss();
     }
+
+
     private void initializeUI(){
 
 
@@ -109,6 +114,11 @@ public class ClientActivity extends AppCompatActivity {
         btnSensing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                try {
+                    listenThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 Intent myIntent = new Intent(ClientActivity.this, SenseActivity.class);
                 startActivity(myIntent);
 
@@ -132,9 +142,14 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void updateUI(String message){
+
+        if (progressDialog.isShowing()) {
+            dismissProgressDialog();
+        }
         Log.d(TAG,message);
         clientList.clear();
-        String [] msgList = message.split(" ");
+        String [] temp = message.split("@");
+        String [] msgList = temp[1].split(" ");
 
         String ip=getIPAddress();
         for (String msg : msgList){
@@ -142,6 +157,7 @@ public class ClientActivity extends AppCompatActivity {
             Client c = new Client(line[0].trim(),line[1].trim(),Integer.valueOf(line[2].trim()));
             clientList.add(c);
             if(ip.equalsIgnoreCase(c.getIpAddress())){
+                myDevice = c;
                 tvIPAddress.setText(c.getIpAddress());
                 tvMACAddress.setText(c.getMacAddress());
                 tvChannelNo.setText(String.valueOf(c.getChannelNo()));
@@ -149,6 +165,9 @@ public class ClientActivity extends AppCompatActivity {
         }
     }
 
+    public static Client getMyDevice(){
+        return myDevice;
+    }
 
     private String getIPAddress(){
         WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
