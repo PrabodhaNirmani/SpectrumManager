@@ -139,9 +139,6 @@ public class ControlActivity extends AppCompatActivity {
         }
     }
 
-//    public static ArrayList<Client> getClientsList(){
-//        return clientsList;
-//    }
 
 
 }

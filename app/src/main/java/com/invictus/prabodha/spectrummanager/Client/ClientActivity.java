@@ -45,6 +45,7 @@ public class ClientActivity extends AppCompatActivity {
     private static final String TAG = "ClientActivity";
     public static final String ACTION_PACKET_RECEIVED = "client_activity_packet_received";
     public  static final String EXTRA_DATA = "extra_data";
+    public  static final String EXTRA_IP_ADDRESS = "extra_ip_address";
 
     private final BroadcastReceiver packetReceiveListener = new BroadcastReceiver() {
         @Override
@@ -102,7 +103,6 @@ public class ClientActivity extends AppCompatActivity {
 
 
     private void initializeUI(){
-
 
         clientList = new ArrayList<>();
 
@@ -168,25 +168,6 @@ public class ClientActivity extends AppCompatActivity {
 
     public static Context getContext(){
         return context;
-    }
-
-    class BroadcastMessageTask extends AsyncTask<Void, Void, Void> {
-
-
-
-        protected Void doInBackground(Void... voids) {
-            try {
-                new MulticastPublisher().multicast("HELLO");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.invictus.prabodha.spectrummanager.Advertise;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,9 +54,9 @@ public class AdvertiseActivityAdapter extends BaseAdapter {
         String [] msgList = messagesList.get(position).split(",");
 
         final String textMessage = msgList[0];
-        final String ipAddress = msgList[1];
-        final String macAddress = msgList[2];
-        String timeStamp = msgList[3];
+        final String ipAddress = msgList[2];
+        //final String macAddress = msgList[2];
+        String timeStamp = msgList[1];
 
         AdvertiseActivityAdapter.Holder holder;
 
@@ -65,7 +66,7 @@ public class AdvertiseActivityAdapter extends BaseAdapter {
             holder = new Holder();
             holder.tvMessage = view.findViewById(R.id.tv_message);
             holder.tvIPAddress = view.findViewById(R.id.tv_ip_value);
-            holder.tvMACAddress = view.findViewById(R.id.tv_mac_value);
+           // holder.tvMACAddress = view.findViewById(R.id.tv_mac_value);
             holder.tvTimestamp = view.findViewById(R.id.tv_timestamp);
             holder.btnRequestChannel = view.findViewById(R.id.request_channel);
 
@@ -73,7 +74,7 @@ public class AdvertiseActivityAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     //advertise to the host
-                    new RequestChannelTask().execute(ipAddress, generatePacketMassage(textMessage,ipAddress,macAddress));
+                    new RequestChannelTask().execute(ipAddress, generatePacketMassage(textMessage));
 
                 }
             });
@@ -86,17 +87,15 @@ public class AdvertiseActivityAdapter extends BaseAdapter {
 
         holder.tvMessage.setText(textMessage);
         holder.tvIPAddress.setText(ipAddress);
-        holder.tvMACAddress.setText(macAddress);
+       // holder.tvMACAddress.setText(macAddress);
         holder.tvTimestamp.setText(timeStamp);
 
         return view;
     }
 
-    private String generatePacketMassage(String textMessage, String ip, String mac){
-        String message = "AdapterAdvertiseActivity@";
-        message += textMessage.split(" ")[1]+",";
-        message += ip+",";
-        message += mac;
+    private String generatePacketMassage(String textMessage){
+        String message = "RequestChannel@";
+        message += textMessage.split(" ")[1].trim();
         return message;
 
     }
@@ -105,7 +104,7 @@ public class AdvertiseActivityAdapter extends BaseAdapter {
 
         TextView tvMessage;
         TextView tvIPAddress;
-        TextView tvMACAddress;
+       // TextView tvMACAddress;
         TextView tvTimestamp;
 
         Button btnRequestChannel;

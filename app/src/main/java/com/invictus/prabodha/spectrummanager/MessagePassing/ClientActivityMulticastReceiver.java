@@ -17,27 +17,30 @@ import java.util.Arrays;
 public class ClientActivityMulticastReceiver extends MulticastReceiver {
 
     @Override
-    protected void notifyReceiveComplete(DatagramPacket packet) {
-        super.notifyReceiveComplete(packet);
+    protected void notifyReceiveComplete(String data, String ip) {
+        super.notifyReceiveComplete(data, ip);
 
-        String data= null;
-        try {
-            data = new String(packet.getData(),"UTF-8").trim();
-
-            if(data.startsWith("ClientActivity")){
-                Intent broadcast = new Intent(ClientActivity.ACTION_PACKET_RECEIVED);
-                broadcast.putExtra(ClientActivity.EXTRA_DATA, data);
-                ClientActivity.getContext().sendBroadcast(broadcast);
-            }else if(data.startsWith("AdvertiseActivity")){
-                Intent broadcast = new Intent(AdvertiseActivity.ACTION_PACKET_RECEIVED);
-                broadcast.putExtra(AdvertiseActivity.EXTRA_DATA, data);
-                AdvertiseActivity.getContext().sendBroadcast(broadcast);
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        if(data.startsWith("ClientActivity")){
+            Intent broadcast = new Intent(ClientActivity.ACTION_PACKET_RECEIVED);
+            broadcast.putExtra(ClientActivity.EXTRA_DATA, data);
+            broadcast.putExtra(ClientActivity.EXTRA_IP_ADDRESS, ip);
+            ClientActivity.getContext().sendBroadcast(broadcast);
+        } else if(data.startsWith("AdvertiseActivity")){
+            Intent broadcast = new Intent(AdvertiseActivity.ACTION_PACKET_RECEIVED);
+            broadcast.putExtra(AdvertiseActivity.EXTRA_DATA, data);
+            broadcast.putExtra(ClientActivity.EXTRA_IP_ADDRESS, ip);
+            AdvertiseActivity.getContext().sendBroadcast(broadcast);
+        } else if(data.startsWith("RequestChannel")) {
+            Intent broadcast = new Intent(AdvertiseActivity.ACTION_REQUEST_CHANNEL_PACKET_RECEIVED);
+            broadcast.putExtra(AdvertiseActivity.EXTRA_DATA, data);
+            broadcast.putExtra(ClientActivity.EXTRA_IP_ADDRESS, ip);
+            AdvertiseActivity.getContext().sendBroadcast(broadcast);
+        } else if(data.startsWith("ChannelGranted")) {
+            Intent broadcast = new Intent(AdvertiseActivity.ACTION_CHANNEL_GRANT_PACKET_RECEIVED);
+            broadcast.putExtra(AdvertiseActivity.EXTRA_DATA, data);
+            broadcast.putExtra(ClientActivity.EXTRA_IP_ADDRESS, ip);
+            AdvertiseActivity.getContext().sendBroadcast(broadcast);
         }
-
-
 
 
     }

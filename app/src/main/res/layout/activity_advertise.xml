@@ -9,10 +9,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.85"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,12 +23,10 @@
                 android:layout_height="wrap_content"
                 android:text="IP Address  :  "
                 android:textSize="15sp"
-                android:textColor="@color/colorPrimary"
-                android:layout_margin="5dp"/>
+                android:textColor="@color/colorPrimary"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:textSize="15sp"
                 android:textColor="@color/colorPrimary"
                 android:id="@+id/tv_ip_value"/>
@@ -47,13 +43,11 @@
                 android:layout_height="wrap_content"
                 android:text="MAC Address  :  "
                 android:textSize="15sp"
-                android:textColor="@color/colorPrimary"
-                android:layout_margin="5dp"/>
+                android:textColor="@color/colorPrimary"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:layout_margin="5dp"
                 android:textColor="@color/colorPrimary"
                 android:id="@+id/tv_mac_value"/>
         </LinearLayout>
@@ -63,32 +57,21 @@
             android:orientation="horizontal"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="30dp">
+            android:layout_marginLeft="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Channel No.  :  "
                 android:textSize="15sp"
-                android:textColor="@color/colorPrimary"
-                android:layout_margin="5dp"/>
+                android:textColor="@color/colorPrimary"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:textSize="15sp"
                 android:textColor="@color/colorPrimary"
                 android:id="@+id/tv_channel_value"/>
         </LinearLayout>
-
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/colorPrimary"/>
 
         <Button
             android:layout_width="wrap_content"
@@ -97,6 +80,15 @@
             android:text="Advertise Me"
             android:layout_gravity="center"
             android:layout_margin="10dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/colorPrimary"/>
+
+
 
         <ListView
             android:layout_width="match_parent"
@@ -108,18 +100,18 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.15"
-        android:orientation="vertical">
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/request_channel"
-            android:layout_margin="10dp"
-            android:layout_gravity="center"
-            android:text="Request Channel"/>
-    </LinearLayout>
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="0.15"-->
+        <!--android:orientation="vertical">-->
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/request_channel"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:text="Request Channel"/>-->
+    <!--</LinearLayout>-->
 
 </LinearLayout>

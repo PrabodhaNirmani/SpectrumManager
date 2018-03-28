@@ -1,11 +1,7 @@
 package com.invictus.prabodha.spectrummanager.MessagePassing;
 
-import android.net.Network;
-import android.util.Log;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
@@ -18,6 +14,8 @@ import java.util.Enumeration;
 public class MulticastPublisher {
 //    private DatagramSocket socket;
     private MulticastSocket socket;
+
+    public static final int PORT = 4446;
 
     private InetAddress group;
     private byte[] buf;
@@ -45,7 +43,7 @@ public class MulticastPublisher {
         group = InetAddress.getByName("230.0.0.0");
         buf = multicastMessage.getBytes();
 
-        DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4446);
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, group, PORT);
         socket.send(packet);
         socket.close();
     }

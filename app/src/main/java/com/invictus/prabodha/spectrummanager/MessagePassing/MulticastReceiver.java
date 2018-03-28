@@ -22,7 +22,7 @@ abstract class MulticastReceiver extends Thread {
     public void run() {
         try {
 
-            socket = new MulticastSocket(4446);
+            socket = new MulticastSocket(MulticastPublisher.PORT);
             InetAddress group = InetAddress.getByName("230.0.0.0");
 
             socket.joinGroup(group);
@@ -30,7 +30,7 @@ abstract class MulticastReceiver extends Thread {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
                 String received = new String(packet.getData(), 0, packet.getLength());
-                notifyReceiveComplete(packet);
+                notifyReceiveComplete(received, packet.getAddress().getHostAddress());
             }
 
             //socket.leaveGroup(group);
@@ -43,7 +43,7 @@ abstract class MulticastReceiver extends Thread {
 
     }
 
-    protected void notifyReceiveComplete(DatagramPacket packet){
+    protected void notifyReceiveComplete(String data, String ip){
 
     }
 }
