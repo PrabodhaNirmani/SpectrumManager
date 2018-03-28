@@ -48,7 +48,6 @@ public class ControlActivityAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder;
-        System.out.println("viewpos" + position);
         View view = convertView;
         if (view == null) {
             view = inflater.inflate(R.layout.activity_control_cell, null);
