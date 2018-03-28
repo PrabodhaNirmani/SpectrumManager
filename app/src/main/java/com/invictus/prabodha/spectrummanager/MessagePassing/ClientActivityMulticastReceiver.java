@@ -40,6 +40,11 @@ public class ClientActivityMulticastReceiver extends MulticastReceiver {
             broadcast.putExtra(AdvertiseActivity.EXTRA_DATA, data);
             broadcast.putExtra(ClientActivity.EXTRA_IP_ADDRESS, ip);
             AdvertiseActivity.getContext().sendBroadcast(broadcast);
+        } else if(data.equalsIgnoreCase("Request Declined")){
+            Intent broadcast = new Intent(AdvertiseActivity.ACTION_REQUEST_DECLINED_PACKET_RECEIVED);
+            broadcast.putExtra(AdvertiseActivity.EXTRA_DATA, data);
+            broadcast.putExtra(ClientActivity.EXTRA_IP_ADDRESS, ip);
+            AdvertiseActivity.getContext().sendBroadcast(broadcast);
         }
 
 

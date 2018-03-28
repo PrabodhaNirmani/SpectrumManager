@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.Formatter;
@@ -19,13 +18,11 @@ import android.widget.TextView;
 
 import com.invictus.prabodha.spectrummanager.Advertise.AdvertiseActivity;
 import com.invictus.prabodha.spectrummanager.MessagePassing.ClientActivityMulticastReceiver;
-import com.invictus.prabodha.spectrummanager.MessagePassing.MulticastPublisher;
 import com.invictus.prabodha.spectrummanager.Models.Client;
 import com.invictus.prabodha.spectrummanager.R;
 import com.invictus.prabodha.spectrummanager.Sense.SenseActivity;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class ClientActivity extends AppCompatActivity {
@@ -51,9 +48,9 @@ public class ClientActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message=intent.getStringExtra(EXTRA_DATA);
-            if (progressDialog.isShowing()) {
-                dismissProgressDialog();
-            }
+//            if (progressDialog.isShowing()) {
+//                dismissProgressDialog();
+//            }
             updateUI(message);
 
         }
@@ -71,7 +68,7 @@ public class ClientActivity extends AppCompatActivity {
 
         new ClientActivityMulticastReceiver().start();
 
-        displayProgressDialog("Please wait","Waiting to receive packet " );
+        //displayProgressDialog("Please wait","Waiting to receive packet " );
 
         packetReceiveFilter = new IntentFilter(ACTION_PACKET_RECEIVED);
         registerReceiver(packetReceiveListener, packetReceiveFilter);
@@ -91,15 +88,15 @@ public class ClientActivity extends AppCompatActivity {
         unregisterReceiver(packetReceiveListener);
     }
 
-    private void displayProgressDialog(String title, String message) {
-        progressDialog = ProgressDialog.show(this, title, message, true);
-    }
-
-
-    private void dismissProgressDialog() {
-        if (progressDialog != null && progressDialog.isShowing())
-            progressDialog.dismiss();
-    }
+//    private void displayProgressDialog(String title, String message) {
+//        progressDialog = ProgressDialog.show(this, title, message, true);
+//    }
+//
+//
+//    private void dismissProgressDialog() {
+//        if (progressDialog != null && progressDialog.isShowing())
+//            progressDialog.dismiss();
+//    }
 
 
     private void initializeUI(){

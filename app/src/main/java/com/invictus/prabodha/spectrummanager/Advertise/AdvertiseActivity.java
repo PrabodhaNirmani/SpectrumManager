@@ -3,6 +3,7 @@ package com.invictus.prabodha.spectrummanager.Advertise;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiInfo;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 
 import com.invictus.prabodha.spectrummanager.Client.ClientActivity;
 import com.invictus.prabodha.spectrummanager.MessagePassing.MulticastPublisher;
+import com.invictus.prabodha.spectrummanager.MessagePassing.UDPClient;
 import com.invictus.prabodha.spectrummanager.R;
 
 import java.io.IOException;
@@ -38,6 +40,7 @@ public class AdvertiseActivity extends AppCompatActivity {
 
     private IntentFilter packetReceiveFilter;
     private IntentFilter requestChannelPacketReceiveFilter;
+    private IntentFilter requestDeclinedPacketReceiveFilter;
     private IntentFilter channelGrantedPacketReceiveFilter;
 
 
@@ -48,13 +51,13 @@ public class AdvertiseActivity extends AppCompatActivity {
     public static final String ACTION_PACKET_RECEIVED = "advertise_activity_packet_received";
     public static final String ACTION_CHANNEL_GRANT_PACKET_RECEIVED = "advertise_activity_channel_grant_packet_received";
     public static final String ACTION_REQUEST_CHANNEL_PACKET_RECEIVED = "advertise_activity_request_channel_packet_received";
+    public static final String ACTION_REQUEST_DECLINED_PACKET_RECEIVED = "advertise_activity_request_declined_packet_received";
+
 
     public  static final String EXTRA_DATA = "extra_data";
     public  static final String EXTRA_IP_ADDRESS = "extra_ip_address";
 
     private static ArrayList<String> messagesList;
-
-
 
     private final BroadcastReceiver packetReceiveListener = new BroadcastReceiver() {
         @Override
@@ -65,18 +68,26 @@ public class AdvertiseActivity extends AppCompatActivity {
         }
     };
 
-
     private final BroadcastReceiver requestChannelPacketReceiveListener = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message=intent.getStringExtra(EXTRA_DATA);
             String ip = intent.getStringExtra(EXTRA_IP_ADDRESS);
-
-
             showRequestChannelAlertDialog(message,ip);
 
         }
     };
+
+    private final BroadcastReceiver requestDeclinedPacketReceiveListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message=intent.getStringExtra(EXTRA_DATA);
+            String ip = intent.getStringExtra(EXTRA_IP_ADDRESS);
+            showRequestDeclinedAlertDialog(message,ip);
+
+        }
+    };
+
 
     private final BroadcastReceiver channelGrantedPacketReceiveListener = new BroadcastReceiver() {
         @Override
@@ -105,6 +116,9 @@ public class AdvertiseActivity extends AppCompatActivity {
         requestChannelPacketReceiveFilter = new IntentFilter(ACTION_REQUEST_CHANNEL_PACKET_RECEIVED);
         registerReceiver(requestChannelPacketReceiveListener, requestChannelPacketReceiveFilter);
 
+        requestDeclinedPacketReceiveFilter = new IntentFilter(ACTION_REQUEST_DECLINED_PACKET_RECEIVED);
+        registerReceiver(requestDeclinedPacketReceiveListener, requestDeclinedPacketReceiveFilter);
+
         channelGrantedPacketReceiveFilter = new IntentFilter(ACTION_CHANNEL_GRANT_PACKET_RECEIVED);
         registerReceiver(channelGrantedPacketReceiveListener, channelGrantedPacketReceiveFilter);
     }
@@ -115,6 +129,7 @@ public class AdvertiseActivity extends AppCompatActivity {
         unregisterReceiver(packetReceiveListener);
         unregisterReceiver(requestChannelPacketReceiveListener);
         unregisterReceiver(channelGrantedPacketReceiveListener);
+        unregisterReceiver(requestDeclinedPacketReceiveListener);
 
     }
 
@@ -124,6 +139,8 @@ public class AdvertiseActivity extends AppCompatActivity {
         registerReceiver(packetReceiveListener,packetReceiveFilter);
         registerReceiver(requestChannelPacketReceiveListener, requestChannelPacketReceiveFilter);
         registerReceiver(channelGrantedPacketReceiveListener, channelGrantedPacketReceiveFilter);
+        registerReceiver(requestDeclinedPacketReceiveListener, requestDeclinedPacketReceiveFilter);
+
 
         setAdapter();
     }
@@ -170,10 +187,7 @@ public class AdvertiseActivity extends AppCompatActivity {
 
     }
 
-    private void showRequestChannelAlertDialog(String message, String ip){
-
-//        AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
-
+    private void showRequestChannelAlertDialog(String message, final String ip){
 
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(new ContextThemeWrapper(AdvertiseActivity.this, R.style.myDialog));
         View mView = getLayoutInflater().inflate(R.layout.request_channel_alert_dialog, null);
@@ -186,28 +200,27 @@ public class AdvertiseActivity extends AppCompatActivity {
 
 
         final EditText etTimeDuration = mView.findViewById(R.id.et_time_duration);
-        Button btnGrant = mView.findViewById(R.id.btn_grant);
-        Button btnDecline = mView.findViewById(R.id.btn_decline);
+
         final TextView tvError = mView.findViewById(R.id.error);
 
-        btnGrant.setOnClickListener(new View.OnClickListener() {
+        mBuilder.setPositiveButton("Grant Access", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                if(etTimeDuration.getText().toString().isEmpty()){
-                    tvError.setVisibility(View.VISIBLE);
+            public void onClick(DialogInterface dialogInterface, int i) {
 
-                }
-                else {
-                    tvError.setVisibility(View.INVISIBLE);
-                }
-                //grant access
+                tvError.setVisibility(View.INVISIBLE);
+                String data = etTimeDuration.getText().toString();
+                Log.d(TAG, data);
+
+
             }
         });
 
-        btnDecline.setOnClickListener(new View.OnClickListener() {
+        mBuilder.setNegativeButton("Decline", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                //decline access
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String msg = "Request Declined";
+                new DeclineRequestTask().execute(msg,ip);
+                //dialogInterface.dismiss();
             }
         });
 
@@ -218,8 +231,28 @@ public class AdvertiseActivity extends AppCompatActivity {
 
     }
 
+    private void showRequestDeclinedAlertDialog(String message, String ip){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(new ContextThemeWrapper(AdvertiseActivity.this, R.style.myDialog));
+        View mView = getLayoutInflater().inflate(R.layout.request_declined_alert_dialog, null);
+
+        TextView tvIPAddress = mView.findViewById(R.id.ip_address);
+        tvIPAddress.setText(ip);
+
+        mBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                dialogInterface.dismiss();
+
+            }
+        });
+
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
 
 
+    }
 
     private String getIPAddress(){
         WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
@@ -274,5 +307,23 @@ public class AdvertiseActivity extends AppCompatActivity {
         }
     }
 
+    class DeclineRequestTask extends AsyncTask<String, Void, Void> {
+
+        protected Void doInBackground(String... voids) {
+            String message = voids[0];
+            String ip = voids[1];
+
+            new UDPClient().sendPacket(ip, message);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+
+        }
+    }
 
 }

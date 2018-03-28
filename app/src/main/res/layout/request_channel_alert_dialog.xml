@@ -63,27 +63,6 @@
         android:id="@+id/error"
         android:text="*Please fill the empty field"
         android:textColor="@color/colorAccent"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="10dp">
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_grant"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp"
 
-            android:text="Grant Access"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Decline"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp"
-            android:id="@+id/btn_decline"
-            android:layout_marginLeft="10dp"/>
-    </LinearLayout>
 
 </LinearLayout>
