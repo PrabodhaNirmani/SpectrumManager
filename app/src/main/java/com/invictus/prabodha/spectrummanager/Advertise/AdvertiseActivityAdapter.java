@@ -1,14 +1,19 @@
 package com.invictus.prabodha.spectrummanager.Advertise;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.invictus.prabodha.spectrummanager.MessagePassing.MulticastPublisher;
+import com.invictus.prabodha.spectrummanager.MessagePassing.UDPClient;
 import com.invictus.prabodha.spectrummanager.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -44,6 +49,14 @@ public class AdvertiseActivityAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+        String [] msgList = messagesList.get(position).split(",");
+
+        final String textMessage = msgList[0];
+        final String ipAddress = msgList[1];
+        final String macAddress = msgList[2];
+        String timeStamp = msgList[3];
+
         AdvertiseActivityAdapter.Holder holder;
 
         View view = convertView;
@@ -54,39 +67,67 @@ public class AdvertiseActivityAdapter extends BaseAdapter {
             holder.tvIPAddress = view.findViewById(R.id.tv_ip_value);
             holder.tvMACAddress = view.findViewById(R.id.tv_mac_value);
             holder.tvTimestamp = view.findViewById(R.id.tv_timestamp);
-            holder.tvDuration = view.findViewById(R.id.tv_free_time);
+            holder.btnRequestChannel = view.findViewById(R.id.request_channel);
+
+            holder.btnRequestChannel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //advertise to the host
+                    new RequestChannelTask().execute(ipAddress, generatePacketMassage(textMessage,ipAddress,macAddress));
+
+                }
+            });
 
             view.setTag(holder);
         } else {
             holder = (AdvertiseActivityAdapter.Holder) view.getTag();
         }
-        String [] msgList = messagesList.get(position).split(",");
 
-        String textMessage = msgList[0];
-        String ipAddress = msgList[1];
-        String macAddress = msgList[2];
-        String timeStamp = msgList[3];
-        String duration = msgList[4];
 
         holder.tvMessage.setText(textMessage);
         holder.tvIPAddress.setText(ipAddress);
         holder.tvMACAddress.setText(macAddress);
         holder.tvTimestamp.setText(timeStamp);
-        holder.tvDuration.setText(duration);
-
 
         return view;
     }
 
+    private String generatePacketMassage(String textMessage, String ip, String mac){
+        String message = "AdapterAdvertiseActivity@";
+        message += textMessage.split(" ")[1]+",";
+        message += ip+",";
+        message += mac;
+        return message;
+
+    }
 
     class Holder {
-
 
         TextView tvMessage;
         TextView tvIPAddress;
         TextView tvMACAddress;
         TextView tvTimestamp;
-        TextView tvDuration;
 
+        Button btnRequestChannel;
+    }
+
+    class RequestChannelTask extends AsyncTask<String, Void, Void> {
+
+        protected Void doInBackground(String... voids) {
+            String ipAddress = voids[0];
+
+            String message = voids[1];
+
+            new UDPClient().sendPacket(ipAddress,message);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+
+        }
     }
 }
