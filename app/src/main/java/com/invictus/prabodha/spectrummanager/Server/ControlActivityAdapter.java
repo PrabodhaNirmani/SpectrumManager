@@ -1,7 +1,7 @@
 package com.invictus.prabodha.spectrummanager.Server;
 
 import android.content.Context;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +48,7 @@ public class ControlActivityAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder;
+        System.out.println("viewpos" + position);
         View view = convertView;
         if (view == null) {
             view = inflater.inflate(R.layout.activity_control_cell, null);

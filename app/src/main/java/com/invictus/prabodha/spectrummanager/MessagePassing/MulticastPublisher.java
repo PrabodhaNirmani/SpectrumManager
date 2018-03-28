@@ -41,12 +41,11 @@ public class MulticastPublisher {
         socket.setNetworkInterface(eth0);
 
         socket.setBroadcast(true);
-        socket.setLoopbackMode(true);
+
         group = InetAddress.getByName("230.0.0.0");
         buf = multicastMessage.getBytes();
 
-        DatagramPacket packet
-                = new DatagramPacket(buf, buf.length, group, 4446);
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4446);
         socket.send(packet);
         socket.close();
     }

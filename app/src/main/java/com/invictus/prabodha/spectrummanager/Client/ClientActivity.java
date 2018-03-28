@@ -46,14 +46,13 @@ public class ClientActivity extends AppCompatActivity {
     public static final String ACTION_PACKET_RECEIVED = "client_activity_packet_received";
     public  static final String EXTRA_DATA = "extra_data";
 
-    private ClientActivityMulticastReceiver listenThread;
-
     private final BroadcastReceiver packetReceiveListener = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message=intent.getStringExtra(EXTRA_DATA);
-
-            Log.d(TAG,message);
+            if (progressDialog.isShowing()) {
+                dismissProgressDialog();
+            }
             updateUI(message);
 
         }
@@ -69,8 +68,7 @@ public class ClientActivity extends AppCompatActivity {
 
         initializeUI();
 
-        listenThread = new ClientActivityMulticastReceiver();
-        listenThread.start();
+        new ClientActivityMulticastReceiver().start();
 
         displayProgressDialog("Please wait","Waiting to receive packet " );
 
@@ -114,11 +112,6 @@ public class ClientActivity extends AppCompatActivity {
         btnSensing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    listenThread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 Intent myIntent = new Intent(ClientActivity.this, SenseActivity.class);
                 startActivity(myIntent);
 
@@ -142,16 +135,13 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void updateUI(String message){
-
-        if (progressDialog.isShowing()) {
-            dismissProgressDialog();
-        }
         Log.d(TAG,message);
         clientList.clear();
-        String [] temp = message.split("@");
-        String [] msgList = temp[1].split(" ");
+        String temp = message.split("@")[1];
+        String [] msgList = temp.split(" ");
 
-        String ip=getIPAddress();
+        String ip=getIPAddress().trim();
+
         for (String msg : msgList){
             String [] line = msg.split(",");
             Client c = new Client(line[0].trim(),line[1].trim(),Integer.valueOf(line[2].trim()));

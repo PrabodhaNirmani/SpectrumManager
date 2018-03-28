@@ -4,9 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,12 +21,13 @@ import com.invictus.prabodha.spectrummanager.MessagePassing.MulticastPublisher;
 import com.invictus.prabodha.spectrummanager.R;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class AdvertiseActivity extends AppCompatActivity {
 
     private TextView tvIPAddress, tvMACAddress, tvChannelNo;
-    private ListView messagelist;
+    private ListView messageListView;
 
     private IntentFilter packetReceiveFilter;
 
@@ -33,6 +37,8 @@ public class AdvertiseActivity extends AppCompatActivity {
     private static final String TAG = "AdvertiseActivity";
     public static final String ACTION_PACKET_RECEIVED = "advertise_activity_packet_received";
     public  static final String EXTRA_DATA = "extra_data";
+
+    private static ArrayList<String> messagesList;
 
     private final BroadcastReceiver packetReceiveListener = new BroadcastReceiver() {
         @Override
@@ -59,7 +65,22 @@ public class AdvertiseActivity extends AppCompatActivity {
         registerReceiver(packetReceiveListener, packetReceiveFilter);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(packetReceiveListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(packetReceiveListener,packetReceiveFilter);
+        setAdapter();
+    }
+
     private void initializeUI(){
+
+        messagesList = new ArrayList<>();
 
         Button btnAdvertiseMe = findViewById(R.id.advertise_me);
         Button btnRequestChannel = findViewById(R.id.request_channel);
@@ -79,7 +100,7 @@ public class AdvertiseActivity extends AppCompatActivity {
             }
         });
 
-        messagelist = findViewById(R.id.msg_list);
+        messageListView = findViewById(R.id.msg_list);
 
         tvIPAddress = findViewById(R.id.tv_ip_value);
         tvMACAddress = findViewById(R.id.tv_mac_value);
@@ -94,8 +115,37 @@ public class AdvertiseActivity extends AppCompatActivity {
 
     private void updateUI(String message){
         Log.d(TAG,message);
+
+
+        String [] temp = message.split("@");
+
+        String ip=getIPAddress().trim();
+        String receivedIPAddress = temp[1].split(",")[1];
+        if(!ip.equalsIgnoreCase(receivedIPAddress)){
+            messagesList.add(temp[1]);
+
+        }
+
+
+        setAdapter();
+
+
+
+
     }
 
+    private String getIPAddress(){
+        WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiMgr != null ? wifiMgr.getConnectionInfo() : null;
+        int ip = wifiInfo != null ? wifiInfo.getIpAddress() : 0;
+        return Formatter.formatIpAddress(ip).trim();
+    }
+
+
+    private void setAdapter(){
+        AdvertiseActivityAdapter adapter = new AdvertiseActivityAdapter(getApplicationContext(), messagesList);
+        messageListView.setAdapter(adapter);
+    }
     private String generateBroadcastMessage(){
         //message, ip, mac, timestamp, time duration
         String message = "AdvertiseActivity@";

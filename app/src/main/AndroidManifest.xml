@@ -19,12 +19,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--<receiver android:name=".MyBroadcastReceiver"  android:exported="true">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED"/>-->
-                <!--<action android:name="android.intent.action.INPUT_METHOD_CHANGED" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
         <activity android:name=".HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

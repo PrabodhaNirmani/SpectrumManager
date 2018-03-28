@@ -7,9 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.invictus.prabodha.spectrummanager.Models.Client;
 import com.invictus.prabodha.spectrummanager.R;
-import com.invictus.prabodha.spectrummanager.Server.ControlActivityAdapter;
 
 import java.util.ArrayList;
 

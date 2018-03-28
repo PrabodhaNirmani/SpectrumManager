@@ -36,8 +36,14 @@ public class ControlActivity extends AppCompatActivity {
         clientsList = new ArrayList<>();
 
         initializeUI();
-        discoverClients();
+        //discoverClients();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setAdapter();
     }
 
     private void setAdapter(){
@@ -83,7 +89,8 @@ public class ControlActivity extends AppCompatActivity {
 
     private void assignChannels(){
         ArrayList<Integer> list=new ArrayList<>();
-        int size=clientsList.size();
+//        int size=clientsList.size();
+        discoverClients();
         Random random = new Random();
         for(Client c:clientsList){
             int randomNo;
