@@ -73,7 +73,6 @@ public class ClientActivity extends AppCompatActivity {
         packetReceiveFilter = new IntentFilter(ACTION_PACKET_RECEIVED);
         registerReceiver(packetReceiveListener, packetReceiveFilter);
 
-
     }
 
     @Override
@@ -127,7 +126,6 @@ public class ClientActivity extends AppCompatActivity {
         tvIPAddress = findViewById(R.id.tv_ip_value);
         tvMACAddress = findViewById(R.id.tv_mac_value);
         tvChannelNo = findViewById(R.id.tv_channel_value);
-
 
     }
 

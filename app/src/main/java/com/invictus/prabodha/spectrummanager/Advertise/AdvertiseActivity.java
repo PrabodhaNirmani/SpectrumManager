@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -27,6 +28,9 @@ import com.invictus.prabodha.spectrummanager.MessagePassing.UDPClient;
 import com.invictus.prabodha.spectrummanager.R;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -94,10 +98,8 @@ public class AdvertiseActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String message=intent.getStringExtra(EXTRA_DATA);
             String ip = intent.getStringExtra(EXTRA_IP_ADDRESS);
+            showChannelGrantedAlertDialog(message, ip);
 
-
-            //show another alert dialog
-            //updateUI(message);
         }
     };
 
@@ -207,10 +209,12 @@ public class AdvertiseActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-                tvError.setVisibility(View.INVISIBLE);
-                String data = etTimeDuration.getText().toString();
-                Log.d(TAG, data);
-
+                if(!etTimeDuration.getText().toString().isEmpty()){
+                    tvError.setVisibility(View.INVISIBLE);
+                    String data = etTimeDuration.getText().toString();
+                    Log.d(TAG, data);
+                    new GrantChannelTask().execute(data, ip);
+                }
 
             }
         });
@@ -251,6 +255,82 @@ public class AdvertiseActivity extends AppCompatActivity {
         final AlertDialog dialog = mBuilder.create();
         dialog.show();
 
+
+    }
+
+    private void showChannelGrantedAlertDialog(String message, String ip){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(new ContextThemeWrapper(AdvertiseActivity.this, R.style.myDialog));
+        View mView = getLayoutInflater().inflate(R.layout.request_granted_alert_dialog, null);
+
+        final String [] data = message.split("@")[1].split(" ");
+
+        TextView tvChannel = mView.findViewById(R.id.channel_no);
+        tvChannel.setText(data[0]);
+
+        TextView tvTime = mView.findViewById(R.id.time_period);
+        tvTime.setText(data[1]);
+
+        TextView tvIPAddress = mView.findViewById(R.id.ip_address);
+        tvIPAddress.setText(ip);
+
+        mBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+//build the hotspot
+
+                setUpHotspot(data[0]);
+                dialogInterface.dismiss();
+
+            }
+        });
+
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+
+
+    }
+
+
+    private void setUpHotspot(String channelNo){
+        WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
+        if(wifiManager != null && wifiManager.isWifiEnabled())
+        {
+            wifiManager.setWifiEnabled(false);
+        }
+        Method getWifiApConfigurationMethod = null;
+        try {
+            getWifiApConfigurationMethod = wifiManager.getClass().getMethod("getWifiApConfiguration");
+            WifiConfiguration netConfig=(WifiConfiguration)getWifiApConfigurationMethod.invoke(wifiManager);
+
+            Log.d("Writing HotspotData", "\nSSID:" + netConfig.SSID + "\nPassword:" + netConfig.preSharedKey + "\n");
+
+//            Field wcBand = WifiConfiguration.class.getField("apBand");
+//            int vb = wcBand.getInt(netConfig);
+//            Log.d("Band was", "val=" + vb);
+//            wcBand.setInt(netConfig, 2); // 2Ghz
+
+            // For Channel change
+            Field wcFreq = WifiConfiguration.class.getField("apChannel");
+            int val = wcFreq.getInt(netConfig);
+            Log.d("Config was", "val=" + val);
+            wcFreq.setInt(netConfig, Integer.parseInt(channelNo));
+
+            Method setWifiApConfigurationMethod = wifiManager.getClass().getMethod("setWifiApConfiguration", WifiConfiguration.class);
+            setWifiApConfigurationMethod.invoke(wifiManager, netConfig);
+
+            // For Saving Data
+            wifiManager.saveConfiguration();
+
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -311,6 +391,27 @@ public class AdvertiseActivity extends AppCompatActivity {
 
         protected Void doInBackground(String... voids) {
             String message = voids[0];
+            String ip = voids[1];
+
+            new UDPClient().sendPacket(ip, message);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+
+        }
+    }
+
+
+
+    class GrantChannelTask extends AsyncTask<String, Void, Void> {
+
+        protected Void doInBackground(String... voids) {
+            String message = "ChannelGranted@"+ClientActivity.getMyDevice().getChannelNo()+" "+voids[0];
             String ip = voids[1];
 
             new UDPClient().sendPacket(ip, message);
