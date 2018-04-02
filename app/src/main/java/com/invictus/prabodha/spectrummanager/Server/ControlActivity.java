@@ -39,7 +39,7 @@ public class ControlActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control);
 
-        //setUpHotspot("11");
+
         clientsList = new ArrayList<>();
 
         initializeUI();

@@ -276,9 +276,10 @@ public class AdvertiseActivity extends AppCompatActivity {
         mBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-//build the hotspot
 
-                setUpHotspot(data[0]);
+                //build the hotspot
+                new SetUpHotspotTask().execute(data[0]);
+                //setUpHotspot(data[0]);
                 dialogInterface.dismiss();
 
             }
@@ -292,29 +293,28 @@ public class AdvertiseActivity extends AppCompatActivity {
     }
 
 
-    private void setUpHotspot(String channelNo){
-        WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
-        if(wifiManager != null && wifiManager.isWifiEnabled())
-        {
+    private void setUpHotspot(String channelNo) {
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        if (wifiManager != null && wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(false);
         }
         Method getWifiApConfigurationMethod = null;
         try {
             getWifiApConfigurationMethod = wifiManager.getClass().getMethod("getWifiApConfiguration");
-            WifiConfiguration netConfig=(WifiConfiguration)getWifiApConfigurationMethod.invoke(wifiManager);
+            WifiConfiguration netConfig = (WifiConfiguration) getWifiApConfigurationMethod.invoke(wifiManager);
 
             Log.d("Writing HotspotData", "\nSSID:" + netConfig.SSID + "\nPassword:" + netConfig.preSharedKey + "\n");
 
             if (netConfig.preSharedKey == "") {
-                netConfig.SSID = "Spectrum app";
+                //netConfig.SSID = netConfig.SSID;
                 netConfig.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
                 netConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
                 netConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
                 netConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
             } else {
-                netConfig.SSID = "Spectrum app";
+                //netConfig.SSID = "Spectrum app";
                 //netConfig.preSharedKey = passWord;
-                netConfig.hiddenSSID = true;
+                netConfig.hiddenSSID = false;
                 netConfig.status = WifiConfiguration.Status.ENABLED;
                 netConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
                 netConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
@@ -326,24 +326,22 @@ public class AdvertiseActivity extends AppCompatActivity {
 
                 Field wcFreq = netConfig.getClass().getField("channel");
 
-                wcFreq.setInt(netConfig, Integer.parseInt(channelNo));
+                wcFreq.setInt(netConfig,Integer.parseInt(channelNo));
                 int val = wcFreq.getInt(netConfig);
-
-
+                Log.d(TAG, val + "");
 
 
             }
             Method setWifiApConfigurationMethod = wifiManager.getClass().getMethod("setWifiApConfiguration", WifiConfiguration.class);
             setWifiApConfigurationMethod.invoke(wifiManager, netConfig);
 
-            Method method = wifiManager.getClass().getMethod("setWifiApEnabled",WifiConfiguration.class, boolean.class);
+            Method method = wifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
             method.invoke(wifiManager, netConfig, true);
 
 
-
             // For Saving Data
+
             wifiManager.saveConfiguration();
-            //setup(netConfig.SSID, netConfig.preSharedKey,wifiManager, netConfig, channelNo);
 
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -357,36 +355,6 @@ public class AdvertiseActivity extends AppCompatActivity {
 
     }
 
-
-    private Boolean setup(String SSID, String passWord, WifiManager wifiManager, WifiConfiguration netConfig, String channelNo){
-        //Method[] mMethods = wifiManager.getClass().getDeclaredMethods();
-
-        try {
-            Method method = wifiManager.getClass().getMethod("setWifiApEnabled",WifiConfiguration.class, boolean.class);
-            WifiConfiguration wifiConfig = new WifiConfiguration();
-
-            try {
-                method.invoke(wifiManager, wifiConfig, true);
-                wifiManager.saveConfiguration();
-                return true;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-//        for (Method mMethod : mMethods) {
-//
-//            if (mMethod.getName().equals("setWifiApEnabled")) {
-//
-//            }
-//            return false;
-//        }
-        return false;
-
-    }
 
     private String getIPAddress(){
         WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
@@ -460,8 +428,6 @@ public class AdvertiseActivity extends AppCompatActivity {
         }
     }
 
-
-
     class GrantChannelTask extends AsyncTask<String, Void, Void> {
 
         protected Void doInBackground(String... voids) {
@@ -480,5 +446,25 @@ public class AdvertiseActivity extends AppCompatActivity {
 
         }
     }
+
+    class SetUpHotspotTask extends AsyncTask<String, Void, Void> {
+
+        protected Void doInBackground(String... voids) {
+
+            setUpHotspot(voids[0]);
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+
+        }
+    }
+
+
 
 }
