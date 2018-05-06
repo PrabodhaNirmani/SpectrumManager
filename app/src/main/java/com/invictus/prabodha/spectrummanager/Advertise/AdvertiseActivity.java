@@ -1,6 +1,5 @@
 package com.invictus.prabodha.spectrummanager.Advertise;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,12 +33,10 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 public class AdvertiseActivity extends AppCompatActivity {
 
-    private TextView tvIPAddress, tvMACAddress, tvChannelNo;
     private ListView messageListView;
 
     private IntentFilter packetReceiveFilter;
@@ -163,9 +160,9 @@ public class AdvertiseActivity extends AppCompatActivity {
 
         messageListView = findViewById(R.id.msg_list);
 
-        tvIPAddress = findViewById(R.id.tv_ip_value);
-        tvMACAddress = findViewById(R.id.tv_mac_value);
-        tvChannelNo = findViewById(R.id.tv_channel_value);
+        TextView tvIPAddress = findViewById(R.id.tv_ip_value);
+        TextView tvMACAddress = findViewById(R.id.tv_mac_value);
+        TextView tvChannelNo = findViewById(R.id.tv_channel_value);
 
         tvIPAddress.setText(ClientActivity.getMyDevice().getIpAddress());
         tvMACAddress.setText(ClientActivity.getMyDevice().getMacAddress());
