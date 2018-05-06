@@ -28,6 +28,7 @@
         android:id="@+id/hotspot"
         android:layout_margin="10dp"
         android:layout_gravity="center"
+        android:visibility="invisible"
         android:text="Hotspot"/>
 
 </LinearLayout>

@@ -34,6 +34,7 @@ public class ClientActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private TextView tvIPAddress, tvMACAddress, tvChannelNo;
+    private Button btnAdvertise,btnSensing;
 
     private IntentFilter packetReceiveFilter;
 
@@ -87,23 +88,23 @@ public class ClientActivity extends AppCompatActivity {
         unregisterReceiver(packetReceiveListener);
     }
 
-//    private void displayProgressDialog(String title, String message) {
-//        progressDialog = ProgressDialog.show(this, title, message, true);
-//    }
-//
-//
-//    private void dismissProgressDialog() {
-//        if (progressDialog != null && progressDialog.isShowing())
-//            progressDialog.dismiss();
-//    }
-
 
     private void initializeUI(){
 
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        if (wifiManager != null && !wifiManager.isWifiEnabled()) {
+            wifiManager.setWifiEnabled(true);
+        }
+
         clientList = new ArrayList<>();
 
-        Button btnAdvertise = findViewById(R.id.btn_advertise);
-        Button btnSensing = findViewById(R.id.btn_sense);
+        btnAdvertise = findViewById(R.id.btn_advertise);
+        btnSensing = findViewById(R.id.btn_sense);
+
+
+//        btnAdvertise.setEnabled(false);
+//        btnSensing.setEnabled(false);
+
 
         btnSensing.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,6 +132,10 @@ public class ClientActivity extends AppCompatActivity {
 
     private void updateUI(String message){
         Log.d(TAG,message);
+
+//        btnAdvertise.setEnabled(true);
+//        btnSensing.setEnabled(true);
+
         clientList.clear();
         String temp = message.split("@")[1];
         String [] msgList = temp.split(" ");
